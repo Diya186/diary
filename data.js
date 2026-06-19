@@ -25,7 +25,7 @@ spreads.push({
           <p>someone happier. someone easier.</p>
           <p>someone less afraid.</p>
         </div>
-        <div class="intro-sig">— diya ♡</div>
+        
       </div>
       <div class="pg-num left">i</div>
     </div>`,
@@ -51,7 +51,9 @@ spreads.push({
           <p>because they spent years trying to become me.</p>
           <p>and there are still days when all i want</p>
           <p>is to become them again.</p>
+          
         </div>
+        <div class="intro-sig">— diya ♡</div>
       </div>
       <div class="pg-num right">ii</div>
     </div>`
