@@ -1,0 +1,489 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --lavender:  #e8e0f5;
+  --lilac:     #d4c1ee;
+  --violet:    #b89dd4;
+  --deep:      #7c5c9e;
+  --deepest:   #4a3060;
+  --ink:       #2e1f3e;
+  --page-l:    #f5f0ff;
+  --page-r:    #faf7ff;
+  --tape:      rgba(180,150,220,0.38);
+  --tape2:     rgba(210,190,240,0.45);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: 'Caveat', cursive;
+  background: #0d0818;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── BACKGROUND CANVAS ── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── AMBIENT STICKERS ── */
+#ambient-stickers {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.amb {
+  position: absolute;
+  opacity: 0;
+  color: rgba(200,170,240,0.55);
+  font-size: 22px;
+  filter: blur(0.4px);
+  transition: opacity 1s;
+  user-select: none;
+}
+
+/* ── SCENE ── */
+#scene {
+  position: relative;
+  z-index: 10;
+  width: min(880px, 96vw);
+  height: min(590px, 86vh);
+  perspective: 2200px;
+}
+
+/* ── SPINE ── */
+#spine {
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 22px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #2a1540, #4a2d6a 40%, #3a2058 60%, #1e1030);
+  z-index: 30;
+  display: none;
+  box-shadow: 0 0 12px rgba(0,0,0,0.5);
+}
+
+/* ── COVER ── */
+#cover {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #3d2458 0%, #5c3680 45%, #7c4fa0 100%);
+  border-radius: 3px 18px 18px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  cursor: pointer;
+  user-select: none;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  box-shadow:
+    -10px 2px 24px rgba(0,0,0,0.7),
+    inset -4px 0 10px rgba(0,0,0,0.35),
+    6px 8px 40px rgba(0,0,0,0.55);
+  transition: box-shadow 0.25s;
+}
+#cover:hover {
+  box-shadow:
+    -16px 2px 32px rgba(0,0,0,0.8),
+    inset -4px 0 10px rgba(0,0,0,0.35),
+    8px 10px 40px rgba(0,0,0,0.6);
+}
+.spine-strip {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 32px;
+  background: linear-gradient(90deg, #1e1030, #3a2058);
+  border-radius: 3px 0 0 3px;
+}
+.cover-deco {
+  position: absolute;
+  font-family: 'Reenie Beanie', cursive;
+  color: rgba(232,224,245,0.14);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  z-index: 1;
+}
+.cover-deco.tl { top: 22px; left: 46px; }
+.cover-deco.br { bottom: 22px; right: 22px; }
+.cover-star {
+  position: absolute;
+  color: rgba(232,224,245,0.18);
+  font-size: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+.cover-title {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: clamp(26px, 5vw, 44px);
+  color: #e8e0f5;
+  text-align: center;
+  line-height: 1.2;
+  padding: 0 48px;
+  position: relative;
+  z-index: 2;
+}
+.cover-subtitle {
+  margin-top: 14px;
+  font-family: 'Just Another Hand', cursive;
+  font-size: clamp(14px, 2.2vw, 20px);
+  color: rgba(232,224,245,0.45);
+  letter-spacing: 0.08em;
+  position: relative;
+  z-index: 2;
+}
+.cover-hint {
+  position: absolute;
+  bottom: 26px;
+  font-family: 'Just Another Hand', cursive;
+  font-size: 14px;
+  color: rgba(232,224,245,0.28);
+  letter-spacing: 0.1em;
+  animation: pulse 2.6s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes pulse { 0%,100%{opacity:0.28;} 50%{opacity:0.72;} }
+
+/* ── BOOK PAGES CONTAINER ── */
+#book-pages {
+  position: absolute;
+  inset: 0;
+  display: none;
+  transform-style: preserve-3d;
+  border-radius: 3px 6px 6px 3px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.7), 0 4px 16px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+/* flip canvas sits on top */
+#flip-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* static left/right page displays */
+.page-face {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+#left-display  { left: 0; }
+#right-display { right: 0; }
+
+/* ── PAGE CONTENT STYLES ── */
+.page-content {
+  width: 100%; height: 100%;
+  position: relative;
+  overflow: hidden;
+  padding: 30px 26px 26px 32px;
+  background: var(--page-l);
+}
+.page-content.right-bg {
+  background: var(--page-r);
+  padding: 30px 32px 26px 26px;
+}
+
+/* ruled lines */
+.page-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 28px,
+    rgba(180,150,220,0.09) 28px, rgba(180,150,220,0.09) 29px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* spine shadow on left page */
+.page-content.left-shadow::before {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0; width: 18px;
+  background: linear-gradient(to right, transparent, rgba(80,40,120,0.1));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.page-content > * { position: relative; z-index: 1; }
+
+/* torn top edge effect */
+.torn-edge {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 8px;
+  background: var(--page-l);
+  z-index: 5;
+  pointer-events: none;
+}
+.torn-edge::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; left: 0; right: 0;
+  height: 6px;
+  background: inherit;
+  clip-path: polygon(
+    0% 0%, 2% 100%, 4% 20%, 6% 90%, 9% 10%, 11% 80%, 14% 30%,
+    17% 95%, 20% 15%, 23% 85%, 26% 25%, 29% 70%, 32% 5%,
+    35% 80%, 38% 20%, 41% 90%, 44% 10%, 47% 75%, 50% 30%,
+    53% 85%, 56% 15%, 59% 95%, 62% 25%, 65% 80%, 68% 5%,
+    71% 70%, 74% 20%, 77% 90%, 80% 10%, 83% 85%, 86% 30%,
+    89% 95%, 92% 15%, 95% 80%, 98% 20%, 100% 0%
+  );
+}
+
+/* ── SCRAPBOOK ELEMENTS ── */
+.tape-h {
+  position: absolute;
+  height: 20px;
+  background: var(--tape);
+  z-index: 6;
+  pointer-events: none;
+  border-radius: 1px;
+}
+.tape-v {
+  position: absolute;
+  width: 18px;
+  background: var(--tape2);
+  z-index: 6;
+  pointer-events: none;
+  border-radius: 1px;
+}
+.sticker {
+  position: absolute;
+  font-size: 18px;
+  z-index: 7;
+  opacity: 0.75;
+  pointer-events: none;
+}
+.margin-note {
+  position: absolute;
+  font-family: 'Reenie Beanie', cursive;
+  font-size: 12px;
+  color: var(--violet);
+  opacity: 0.55;
+  transform: rotate(-90deg);
+  transform-origin: left center;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 7;
+  left: 6px;
+}
+.ink-splat {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(124,92,158,0.2);
+  pointer-events: none;
+  z-index: 3;
+}
+.corner-fold {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 0 24px 24px;
+  border-color: transparent transparent rgba(180,150,220,0.25) transparent;
+  z-index: 8;
+  pointer-events: none;
+}
+.washi {
+  position: absolute;
+  height: 14px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(180,150,220,0.3) 0px, rgba(200,170,240,0.4) 8px,
+    rgba(160,130,200,0.25) 16px
+  );
+  z-index: 6;
+  pointer-events: none;
+  border-radius: 2px;
+}
+.doodle-star {
+  position: absolute;
+  color: rgba(124,92,158,0.25);
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ── TYPOGRAPHY ── */
+.pg-title {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: clamp(19px, 3.2vw, 28px);
+  color: var(--deepest);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.pg-mood {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: 14px;
+  color: var(--violet);
+  margin-bottom: 10px;
+  display: block;
+}
+.pg-body {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(13px, 1.8vw, 16px);
+  color: var(--ink);
+  line-height: 1.85;
+  opacity: 0.86;
+}
+.pg-body p { margin-bottom: 6px; }
+.pg-body em { font-style: italic; color: var(--deep); }
+.pg-num {
+  position: absolute;
+  bottom: 14px;
+  font-family: 'Just Another Hand', cursive;
+  font-size: 13px;
+  color: var(--violet);
+  opacity: 0.45;
+  z-index: 8;
+}
+.pg-num.left  { left: 32px; }
+.pg-num.right { right: 32px; }
+
+/* ── SPECIAL PAGES ── */
+.intro-big {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: clamp(24px, 4vw, 38px);
+  color: var(--deepest);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.intro-sig {
+  font-family: 'Reenie Beanie', cursive;
+  font-size: 22px;
+  color: var(--deep);
+  margin-top: 14px;
+}
+.toc-heading {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--deepest);
+  border-bottom: 1.5px solid rgba(124,92,158,0.2);
+  padding-bottom: 8px;
+  margin-bottom: 18px;
+}
+.toc-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 11px;
+  cursor: pointer;
+}
+.toc-num  { font-family:'Reenie Beanie',cursive; font-size:13px; color:var(--violet); min-width:18px; }
+.toc-name { font-family:'Caveat',cursive; font-size:clamp(13px,1.8vw,16px); color:var(--ink); flex:1; border-bottom:1px dashed rgba(180,150,220,0.35); padding-bottom:2px; transition:color 0.2s; }
+.toc-item:hover .toc-name { color: var(--deep); }
+.toc-pg   { font-family:'Just Another Hand',cursive; font-size:12px; color:var(--violet); opacity:0.55; }
+
+.more-big {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: clamp(26px,4.5vw,40px);
+  color: var(--deepest);
+  text-align: center;
+  line-height: 1.25;
+  margin-bottom: 16px;
+}
+.more-sub {
+  font-family: 'Just Another Hand', cursive;
+  font-size: 17px;
+  color: var(--violet);
+  text-align: center;
+  letter-spacing: 0.08em;
+}
+.closing-line {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: clamp(17px,3vw,24px);
+  color: var(--deepest);
+  text-align: center;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* center helper */
+.page-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+/* ── NAV ── */
+#nav {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  gap: 14px;
+  z-index: 200;
+  align-items: center;
+}
+#nav button {
+  background: rgba(50,24,70,0.75);
+  border: 1px solid rgba(180,150,220,0.28);
+  border-radius: 40px;
+  color: var(--lavender);
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  padding: 7px 22px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: background 0.2s, border-color 0.2s;
+}
+#nav button:hover:not(:disabled) {
+  background: rgba(80,44,110,0.85);
+  border-color: rgba(180,150,220,0.55);
+}
+#nav button:disabled { opacity: 0.2; cursor: default; }
+.pg-indicator {
+  font-family: 'Just Another Hand', cursive;
+  font-size: 14px;
+  color: rgba(232,224,245,0.35);
+  min-width: 70px;
+  text-align: center;
+}
+
+/* ── FLIP ANIMATION (CSS class toggled by JS) ── */
+.flipping-out-left {
+  animation: flipOutLeft 0.42s cubic-bezier(0.55,0,1,0.45) forwards;
+  transform-origin: right center;
+  transform-style: preserve-3d;
+}
+.flipping-in-right {
+  animation: flipInRight 0.42s cubic-bezier(0,0.55,0.45,1) forwards;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+@keyframes flipOutLeft {
+  from { transform: rotateY(0deg); box-shadow: none; }
+  to   { transform: rotateY(-180deg); box-shadow: none; }
+}
+@keyframes flipInRight {
+  from { transform: rotateY(180deg); }
+  to   { transform: rotateY(0deg); }
+}

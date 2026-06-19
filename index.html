@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>dear every girl i've been</title>
+<link rel="stylesheet" href="style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Reenie+Beanie&family=Just+Another+Hand&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- BACKGROUND CANVAS (particles + gradient) -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- FLOATING SCRAPBOOK STICKERS AROUND THE BOOK -->
+<div id="ambient-stickers">
+  <span class="amb" style="top:8%;left:4%;font-size:32px;transform:rotate(-12deg)">🌸</span>
+  <span class="amb" style="top:18%;left:2%;font-size:18px;transform:rotate(6deg)">✦</span>
+  <span class="amb" style="top:72%;left:3%;font-size:26px;transform:rotate(-8deg)">💜</span>
+  <span class="amb" style="top:85%;left:7%;font-size:20px;transform:rotate(14deg)">✧</span>
+  <span class="amb" style="top:6%;left:88%;font-size:28px;transform:rotate(10deg)">🌙</span>
+  <span class="amb" style="top:20%;right:3%;font-size:16px;transform:rotate(-5deg)">✦</span>
+  <span class="amb" style="top:55%;right:2%;font-size:30px;transform:rotate(8deg)">🫧</span>
+  <span class="amb" style="top:80%;right:5%;font-size:22px;transform:rotate(-15deg)">💫</span>
+  <span class="amb" style="top:40%;left:1%;font-size:14px;transform:rotate(20deg)">♡</span>
+  <span class="amb" style="top:92%;left:40%;font-size:18px;transform:rotate(-4deg)">✧</span>
+  <span class="amb" style="top:3%;left:45%;font-size:14px;transform:rotate(7deg)">✦</span>
+  <span class="amb" style="top:90%;right:20%;font-size:24px;transform:rotate(-10deg)">🌸</span>
+  <span class="amb" style="top:60%;left:5%;font-size:13px;transform:rotate(15deg)">✦</span>
+  <span class="amb" style="top:35%;right:1%;font-size:20px;transform:rotate(-18deg)">🩷</span>
+</div>
+
+<!-- SCENE -->
+<div id="scene">
+  <!-- BOOK SPINE (always visible once open) -->
+  <div id="spine"></div>
+
+  <!-- COVER (front) -->
+  <div id="cover" onclick="openBook()">
+    <div class="spine-strip"></div>
+    <span class="cover-star" style="top:16%;left:14%">✦</span>
+    <span class="cover-star" style="top:70%;left:9%;font-size:13px">✧</span>
+    <span class="cover-star" style="top:28%;right:12%;font-size:28px">✦</span>
+    <span class="cover-star" style="top:82%;right:15%;font-size:15px">✧</span>
+    <span class="cover-star" style="top:52%;left:22%;font-size:10px">✦</span>
+    <div class="cover-deco tl">a collection of thoughts · 2026</div>
+    <div class="cover-deco br">diya rathod</div>
+    <div class="cover-title">dear every girl<br>i've been</div>
+    <div class="cover-subtitle">by diya rathod</div>
+    <div class="cover-hint">open me ✦</div>
+  </div>
+
+  <!-- BOOK PAGES CONTAINER -->
+  <div id="book-pages">
+    <!-- flip overlay canvas -->
+    <canvas id="flip-canvas"></canvas>
+    <!-- static left/right page displays -->
+    <div id="left-display" class="page-face" onclick="handlePageClick('left')"></div>
+    <div id="right-display" class="page-face" onclick="handlePageClick('right')"></div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <button id="btn-prev" onclick="prevPage()" disabled>← prev</button>
+  <div id="pg-ind" class="pg-indicator"></div>
+  <button id="btn-next" onclick="nextPage()">next →</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="data.js"></script>
+<script src="bg.js"></script>
+<script src="book.js"></script>
+</body>
+</html>
